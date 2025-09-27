@@ -179,3 +179,64 @@ CREATE TABLE payments (
 
 
 ## MongoDB Collection Design
+
+
+### Collection: `prescriptions`
+Stores prescription details, metadata, and optional attachments.
+
+```json
+{
+  "_id": "ObjectId('64fabc1234567890abcd1234')",
+  "patientId": 101,
+  "doctorId": 22,
+  "appointmentId": 305,
+  "medications": [
+    {
+      "name": "Amoxicillin",
+      "dosage": "500mg",
+      "instructions": "Take one capsule every 8 hours with food",
+      "durationDays": 7
+    },
+    {
+      "name": "Ibuprofen",
+      "dosage": "200mg",
+      "instructions": "Take as needed for pain",
+      "durationDays": 5
+    }
+  ],
+  "doctorNotes": "Patient has mild infection. Monitor for allergic reactions.",
+  "refills": [
+    {
+      "refillNumber": 1,
+      "date": "2025-09-25T10:00:00Z",
+      "pharmacy": {
+        "name": "CityCare Pharmacy",
+        "location": "123 Market Street"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "fileName": "lab_results.pdf",
+      "url": "https://s3.example.com/uploads/lab_results.pdf",
+      "uploadedAt": "2025-09-24T08:45:00Z"
+    }
+  ],
+  "tags": ["antibiotics", "infection", "follow-up"],
+  "createdAt": "2025-09-24T08:30:00Z",
+  "updatedAt": "2025-09-25T10:05:00Z"
+}
+```
+
+---
+
+### Design Considerations
+- **References vs. Embedding:**  
+  - Store `patientId`, `doctorId`, and `appointmentId` as references to the SQL system.  
+  - Embed prescription-specific details (medications, notes, attachments).  
+- **Attachments:** Store small metadata (file name, URL) in MongoDB, but use external storage (e.g., S3, GridFS) for large files.  
+- **Evolving Schema:** MongoDB allows adding fields (e.g., `tags`, `sideEffects`) without migrations.  
+- **Indexing:** Consider indexes on `patientId`, `doctorId`, or `appointmentId` for quick lookups.  
+- **Alternative Collections:**  
+  - `feedback` → store patient reviews and ratings.  
+  - `logs` → record patient check-ins, system actions, or chat messages.  
