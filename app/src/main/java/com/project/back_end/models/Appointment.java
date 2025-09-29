@@ -1,5 +1,11 @@
 package com.project.back_end.models;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 
 @Entity
 public class Appointment {
@@ -15,7 +21,7 @@ public class Appointment {
 
   @ManyToOne
   @NotNull
-  private Patient patient
+  private Patient patient;
 
   @Future(message = "Appointment time must be in the future.")
   private LocalDateTime appointmentTime;
@@ -24,12 +30,6 @@ public class Appointment {
   @NotNull(message="Status cannot be null.")
   private Integer status;
 
-
-  private void localDateTime getEndTime(appointmentTime) {
-
-    System.out.println("The end time of the appointment will be: " + (appointmentTime + 1));
-    
-  }
 
   @Transient
   public LocalDateTime getEndTime() {
@@ -59,7 +59,7 @@ public class Appointment {
         
     }
 
-    public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentTime, AppointmentStatus status) {
+    public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentTime, Integer status) {
         this.doctor = doctor;
         this.patient = patient;
         this.appointmentTime = appointmentTime;
@@ -99,11 +99,11 @@ public class Appointment {
         this.appointmentTime = appointmentTime;
     }
 
-    public AppointmentStatus getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(AppointmentStatus status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 }
