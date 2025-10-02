@@ -1,16 +1,34 @@
 package com.project.back_end.services;
 
+@Service
 public class PatientService {
-// 1. **Add @Service Annotation**:
-//    - The `@Service` annotation is used to mark this class as a Spring service component. 
-//    - It will be managed by Spring's container and used for business logic related to patients and appointments.
-//    - Instruction: Ensure that the `@Service` annotation is applied above the class declaration.
 
-// 2. **Constructor Injection for Dependencies**:
-//    - The `PatientService` class has dependencies on `PatientRepository`, `AppointmentRepository`, and `TokenService`.
-//    - These dependencies are injected via the constructor to maintain good practices of dependency injection and testing.
-//    - Instruction: Ensure constructor injection is used for all the required dependencies.
+    private PatientRepository patientRepository;
+    private AppointmentRepository appointmentRepository;
+    private TokenService tokenService;
 
+    public PatientService(PatientRepository patientRepository,
+                         AppointmentRepository appointmentRepository,
+                         TokenService tokenService) {
+
+        this.patientRepository = patientRepository;
+        this.appointmentRepository = appointmentRepository;
+        this.tokenService = tokenService;
+
+    }
+
+
+    public int createPatient(Patient patient) {
+
+        try {
+
+            Patient newPatient = 
+        }
+    }
+        
+
+        
+        
 // 3. **createPatient Method**:
 //    - Creates a new patient in the database. It saves the patient object using the `PatientRepository`.
 //    - If the patient is successfully saved, the method returns `1`; otherwise, it logs the error and returns `0`.
