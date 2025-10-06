@@ -8,7 +8,7 @@ public class Login {
 
     // Default constructor (optional, Java provides this automatically)
 
-    public Login(){
+    public Login(){}
 
     // Getter methods 
     public String getEmail() {
