@@ -1,9 +1,9 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.entities.Prescription;
+import com.project.back_end.models.Prescription;
 import com.project.back_end.services.AppointmentService;
 import com.project.back_end.services.PrescriptionService;
-import com.project.back_end.services.Service;
+import com.project.back_end.services.CentralService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +21,11 @@ import java.util.Map;
 public class PrescriptionController {
 
     private PrescriptionService prescriptionService;
-    private Service service;
+    private CentralService service;
     private AppointmentService appointmentService;
 
     public PrescriptionController(PrescriptionService prescriptionService,
-                                 Service service, AppointmentService appointmentService) {
+                                 CentralService service, AppointmentService appointmentService) {
 
         this.prescriptionService = prescriptionService;
         this.service = service;
