@@ -194,13 +194,13 @@ public class AppointmentService {
     }
   }
 
-  
   @Transactional
-  public int changeStatus(int status){}
-// 8. **Change Status Method**:
-//    - This method updates the status of an appointment by changing its value in the database.
-//    - It should be annotated with `@Transactional` to ensure the operation is executed in a single transaction.
-//    - Instruction: Add `@Transactional` before this method to ensure atomicity when updating appointment status.
+    public void changeStatus(Long appointmentId, String newStatus) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found with ID: " + appointmentId));
 
+        appointment.setStatus(newStatus);
+        appointmentRepository.save(appointment);
+    }
 
 }
