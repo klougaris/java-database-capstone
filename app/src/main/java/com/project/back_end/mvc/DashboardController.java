@@ -12,7 +12,7 @@ public class DashboardController {
   @Autowire
   private Service service;
 
-  @GetMapping(/adminDashboard/{token})
+  @GetMapping("/adminDashboard/{token}")
   public String adminDashboard(@PathVariable("token") String token) {
 
     //Validate the token for the 'admin' role
@@ -28,7 +28,7 @@ public class DashboardController {
       
   }
 
-  @GetMapping(/doctorDashboard/{token})
+  @GetMapping("/doctorDashboard/{token}")
   public String doctorDashboard(@PathVariable("token") String token) {
 
     //Validate the token for the 'admin' role
