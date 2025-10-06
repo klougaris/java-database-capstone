@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Collections;
 
 @Service
-public class Service {
+public class CentralService {
 
 private final TokenService tokenService;
 private final AdminRepository adminRepository;
@@ -31,7 +31,7 @@ private final DoctorService doctorService;
 private final PatientService patientService;
 
 
-  public Service(TokenService tokenService,  
+  public CentralService(TokenService tokenService,  
                    AdminRepository adminRepository,
                    PrescriptionRepository prescriptionRepository,
                    AppointmentRepository appointmentRepository,
