@@ -88,9 +88,10 @@ public class AppointmentService {
 
         Appointment appointment = appointmentOpt.get();
 
-        // Assume tokenService validates token and returns user info
-        Map<String, Object> userMap = tokenService.validateToken(token, "patient"); 
-        if (userMap.isEmpty() || !userMap.get("id").equals(appointment.getPatient().getId())) {
+        boolean isValid = tokenService.validateToken(token, "patient");
+        Long patientId = tokenService.getPatientIdFromToken(token);
+
+        if (!isValid || patientId == null || !patientId.equals(appointment.getPatient().getId())) {
             response.put("message", "Unauthorized to cancel this appointment");
             return ResponseEntity.status(403).body(response);
         }
@@ -105,12 +106,14 @@ public class AppointmentService {
     public Map<String, Object> getAppointment(String pname, LocalDate date, String token) {
         Map<String, Object> result = new HashMap<>();
 
-        // Assume tokenService returns doctor info
-        Map<String, Object> doctorMap = tokenService.validateToken(token, "doctor");
-        if (doctorMap.isEmpty()) {
-            result.put("message", "Invalid token");
+        boolean isValid = tokenService.validateToken(token, "doctor");
+        Long doctorId = tokenService.getDoctorIdFromToken(token);
+
+        if (!isValid || doctorId == null) {
+            result.put("message", "Invalid or unauthorized token");
             return result;
         }
+
 
         Long doctorId = (Long) doctorMap.get("id");
 
