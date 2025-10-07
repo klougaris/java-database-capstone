@@ -1,79 +1,76 @@
 package com.project.back_end.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Entity
 public class Doctor {
 
+    // 1. Primary Key
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long doctor_id;
+    // 2. Doctor's full name
+    @NotNull(message = "Name can not be null.")
+    @Size(min = 3, max = 100)
+    @Column(nullable = false)
+    private String name;
 
-  @NotNull(message = "Name cannot be null.")
-  @Size(min = 3, max = 100)
-  private String name;
+    // 3. Medical specialty
+    @NotNull(message = "Specialty can not be null.")
+    @Size(min = 3, max = 50)
+    @Column(nullable = false)
+    private String specialty;
 
-  @NotNull(message = "specialty")
-  @Size(min = 3, max = 50)
-  private String specialty;
+    // 4. Email address
+    @NotNull(message = "Email can not be null.")
+    @Email
+    @Column(nullable = false, unique = true)
+    private String email;
 
-  @NotNull(message = "Email cannot be null.")
-  @Email(message = "Invalid email format")
-  private String email;
+    // 5. Password (write-only in JSON)
+    @NotNull(message = "Password can not be null.")
+    @Size(min = 6)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(nullable = false)
+    private String password;
 
-  @NotNull(message = "Password cannot be null.")
-  @Size(min = 6)
-  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  private String password;
+    // 6. Phone number (10 digits)
+    @NotNull(message = "Phone can not be null.")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
+    @Column(nullable = false, unique = true)
+    private String phone;
 
-  @NotNull(message = "Phone cannot be null.")
-  @Pattern(regexp = "^[0-9]{10}$")
-  private String phone;
+    // 7. Available time slots
+    @ElementCollection
+    @CollectionTable(name = "doctor_available_times", joinColumns = @JoinColumn(name = "doctor_id"))
+    @Column(name = "time_slot")
+    private List<String> availableTimes;
 
-  @ElementCollection
-  private List<String> availableTimes;
+    // Default constructor (required by JPA)
+    public Doctor() {}
 
-
-
-    public Doctor() {
-    }
-
-    
-    public Doctor(String name, String specialty, String email, String phone, List<String> availableTimes) {
-        this.name = name;
-        this.specialty = specialty;
-        this.email = email;
-        this.phone = phone;
-        if (availableTimes != null) {
-            this.availableTimes = availableTimes;
-        }
-    }
-
-    
+    // Parameterized constructor
     public Doctor(String name, String specialty, String email, String password, String phone, List<String> availableTimes) {
         this.name = name;
         this.specialty = specialty;
         this.email = email;
         this.password = password;
         this.phone = phone;
-        if (availableTimes != null) {
-            this.availableTimes = availableTimes;
-        }
+        this.availableTimes = availableTimes;
     }
 
-    
-
-    public Long getDoctor_id() {
-        return doctor_id;
+    // Getters and setters
+    public Long getId() {
+        return id;
     }
 
-    public void setDoctor_id(Long doctor_id) {
-        this.doctor_id = doctor_id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -100,7 +97,10 @@ public class Doctor {
         this.email = email;
     }
 
-  
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -121,4 +121,3 @@ public class Doctor {
         this.availableTimes = availableTimes;
     }
 }
-
