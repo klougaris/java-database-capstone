@@ -1,115 +1,123 @@
 package com.project.back_end.services;
 
+import com.project.back_end.model.Admin;
+import com.project.back_end.model.Doctor;
+import com.project.back_end.model.Patient;
 import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-
-import jakarta.transaction.Transactional;
-import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
-
 
 @Component
 public class TokenService {
 
-  private final AdminRepository adminRepository;
-  private final DoctorRepository doctorRepository;
-  private final PatientRepository patientRepository;
-  
-  // Inject secret key from application properties
-  @Value("${jwt.secret}")
-  private String secretKey;
+    private final AdminRepository adminRepository;
+    private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
 
- 
-  // Token expiration: 7 days
-  private static final long EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+    @Value("${jwt.secret}")
+    private String secret; // Secret key from application.properties
 
+    public TokenService(AdminRepository adminRepository,
+                        DoctorRepository doctorRepository,
+                        PatientRepository patientRepository) {
+        this.adminRepository = adminRepository;
+        this.doctorRepository = doctorRepository;
+        this.patientRepository = patientRepository;
+    }
 
+    // -------------------------------
+    // 🔐 1. Generate JWT Token
+    // -------------------------------
+    public String generateToken(String identifier) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-  public TokenService( AdminRepository adminRepository,
-                     DoctorRepository doctorRepository,
-                     PatientRepository patientRepository) {
-
-
-      this.adminRepository = adminRepository;
-      this.doctorRepository = doctorRepository;
-      this.patientRepository = patientRepository;
-    
-  }
-
-  private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes());
-  }
-
-  public String generateToken(String identifier) {
         return Jwts.builder()
-                .setSubject(identifier)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setSubject(identifier) // email or username
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
-  }
-
-  public String extractIdentifier(String token) {
-    try {
-        // Parse and validate the token
-        Jws<Claims> claimsJws = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token);
-
-        // Extract the subject (identifier, e.g., email or username)
-        return claimsJws.getBody().getSubject();
-
-    } catch (Exception e) {
-        System.out.println("Error extracting identifier from token: " + e.getMessage());
-        e.printStackTrace();
-        return null; // return null if token is invalid or expired
     }
-}
-  
-@Transactional
-public boolean validateToken(String token, String userType) {
-    try {
-        // 1. Extract identifier (email or username) from token
-        String identifier = extractIdentifier(token);
-        if (identifier == null || identifier.isEmpty()) {
-            return false; // invalid token
+
+    // -------------------------------
+    // 🧩 2. Extract Identifier (email or username)
+    // -------------------------------
+    public String extractIdentifier(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getSubject();
+        } catch (JwtException e) {
+            return null; // Token invalid or expired
         }
-
-        // 2. Check existence based on user type
-        switch (userType.toLowerCase()) {
-            case "admin":
-                return adminRepository.findByUsername(identifier) != null;
-
-            case "doctor":
-                return doctorRepository.findByEmail(identifier) != null;
-
-            case "patient":
-                return patientRepository.findByEmail(identifier) != null;
-
-            default:
-                System.out.println("Unknown user type: " + userType);
-                return false;
-        }
-
-    } catch (Exception e) {
-        System.out.println("Error validating token for user type " + userType + ": " + e.getMessage());
-        e.printStackTrace();
-        return false; // treat exceptions as invalid token
     }
-}
 
+    // -------------------------------
+    // ✅ 3. Validate Token
+    // -------------------------------
+    public boolean validateToken(String token, String userType) {
+        try {
+            String identifier = extractIdentifier(token);
+            if (identifier == null) return false;
 
+            switch (userType.toLowerCase()) {
+                case "admin":
+                    Admin admin = adminRepository.findByUsername(identifier);
+                    return admin != null;
+                case "doctor":
+                    Doctor doctor = doctorRepository.findByEmail(identifier);
+                    return doctor != null;
+                case "patient":
+                    Patient patient = patientRepository.findByEmail(identifier);
+                    return patient != null;
+                default:
+                    return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
+    // -------------------------------
+    // 🔑 4. Get Signing Key
+    // -------------------------------
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    // -------------------------------
+    // 🧠 5. Helper Methods to Extract IDs
+    // -------------------------------
+
+    // 🔸 Get Doctor ID from Token
+    public Long getDoctorIdFromToken(String token) {
+        String email = extractIdentifier(token);
+        if (email == null) return null;
+
+        Doctor doctor = doctorRepository.findByEmail(email);
+        return doctor != null ? doctor.getId() : null;
+    }
+
+    // 🔸 Get Patient ID from Token
+    public Long getPatientIdFromToken(String token) {
+        String email = extractIdentifier(token);
+        if (email == null) return null;
+
+        Patient patient = patientRepository.findByEmail(email);
+        return patient != null ? patient.getId() : null;
+    }
 }
