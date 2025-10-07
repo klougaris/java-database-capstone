@@ -5,39 +5,30 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class AppointmentDTO {
-  
-  private Long id;
 
-  private Long doctorId;
+    private Long id;
+    private Long doctorId;
+    private String doctorName;
+    private Long patientId;
+    private String patientName;
+    private String patientEmail;
+    private String patientPhone;
+    private String patientAddress;
+    private LocalDateTime appointmentTime;
+    private int status;
 
-  private String doctorName;
+    // Derived fields
+    private LocalDate appointmentDate;
+    private LocalTime appointmentTimeOnly;
+    private LocalDateTime endTime;
 
-  private Long patientId;
-
-  private String patientName;
-  
-  private String patientEmail;
-
-  private String patientPhone;
-
-  private String patientAddress;
-
-  private LocalDateTime appointmentTime;
-
-  private int status;
-
-  private LocalDate appointmentDate;
-
-  private LocalTime appointmentTimeOnly;
-
-  private LocalDateTime endTime;
-
-    // Constructor that initializes fields and computes derived values
+    /**
+     * Constructor initializing all appointment fields and computing derived values.
+     */
     public AppointmentDTO(Long id, Long doctorId, String doctorName,
                           Long patientId, String patientName, String patientEmail,
                           String patientPhone, String patientAddress,
                           LocalDateTime appointmentTime, int status) {
-
         this.id = id;
         this.doctorId = doctorId;
         this.doctorName = doctorName;
@@ -49,7 +40,7 @@ public class AppointmentDTO {
         this.appointmentTime = appointmentTime;
         this.status = status;
 
-        // Automatically compute derived fields
+        // Derived fields
         if (appointmentTime != null) {
             this.appointmentDate = appointmentTime.toLocalDate();
             this.appointmentTimeOnly = appointmentTime.toLocalTime();
@@ -57,7 +48,7 @@ public class AppointmentDTO {
         }
     }
 
-    // ===== Getter methods =====
+    // ===== Getters =====
 
     public Long getId() {
         return id;
@@ -111,4 +102,3 @@ public class AppointmentDTO {
         return endTime;
     }
 }
-
