@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface PrescriptionRepository extends MongoRepository<Prescription, String> {
 
-  public List<Prescription> findByAppointmentId(Long appointmentId);
-  
+    // Find prescriptions by appointment ID
+    List<Prescription> findByAppointmentId(Long appointmentId);
 }
-
