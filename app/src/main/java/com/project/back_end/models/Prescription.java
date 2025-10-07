@@ -1,38 +1,44 @@
 package com.project.back_end.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection = "prescriptions")
 public class Prescription {
 
-  @Id
-  private String id;
+    // 1. MongoDB document ID
+    @Id
+    private String id;
 
-  @NotNull(message = "Patient name cannot be null.")
-  @Size(min = 3, max = 100)
-  private String patientName;
+    // 2. Patient's full name
+    @NotNull(message="Name can not be null.")
+    @Size(min = 3, max = 100)
+    private String patientName;
 
-  @NotNull(message = "Appointment ID cannot be null.")
-  private Long appointmentId;
+    // 3. Associated appointment ID (reference)
+    @NotNull(message="Appointment ID can not be null.")
+    private Long appointmentId;
 
-  @NotNull(message = "Medication cannot be null.")
-  @Size(min = 3, max = 100)
-  private String medication;
+    // 4. Medication name
+    @NotNull(message="Medication can not be null.")
+    @Size(min = 3, max = 100)
+    private String medication;
 
-  @NotNull(message = "Name cannot be null.")
-  private String dosage;
+    // 5. Dosage details
+    @NotNull(message="Dosage can not be null.")
+    @Size(min = 3, max = 20)
+    private String dosage;
 
-  @Size(max = 200)
-  private String doctorNotes;
+    // 6. Optional doctor's notes
+    @Size(max = 200)
+    private String doctorNotes;
 
-    
-    public Prescription() {
-    }
+    // Default constructor (required by Spring Data)
+    public Prescription() {}
 
-  
+    // Parameterized constructor
     public Prescription(String patientName, Long appointmentId, String medication, String dosage, String doctorNotes) {
         this.patientName = patientName;
         this.appointmentId = appointmentId;
@@ -41,17 +47,7 @@ public class Prescription {
         this.doctorNotes = doctorNotes;
     }
 
-  
-    public Prescription(String id, String patientName, Long appointmentId, String medication, String dosage, String doctorNotes) {
-        this.id = id;
-        this.patientName = patientName;
-        this.appointmentId = appointmentId;
-        this.medication = medication;
-        this.dosage = dosage;
-        this.doctorNotes = doctorNotes;
-    }
-
-
+    // Getters and setters
     public String getId() {
         return id;
     }
@@ -99,6 +95,4 @@ public class Prescription {
     public void setDoctorNotes(String doctorNotes) {
         this.doctorNotes = doctorNotes;
     }
-
-
 }
