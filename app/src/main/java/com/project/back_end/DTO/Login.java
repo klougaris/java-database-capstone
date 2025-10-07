@@ -1,32 +1,34 @@
 package com.project.back_end.DTO;
 
 public class Login {
-    
-    private String email;
 
+    private String identifier;
     private String password;
 
-    // Default constructor (optional, Java provides this automatically)
+    // Default constructor
+    public Login() {}
 
-    public Login(){}
+    // Optional parameterized constructor (useful for tests or service calls)
+    public Login(String identifier, String password) {
+        this.identifier = identifier;
+        this.password = password;
+    }
 
-    // Getter methods 
-    public String getEmail() {
-        return email;
+    // ===== Getters and Setters =====
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public String getPassword() {
         return password;
     }
 
-    // Setter methods
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
-
-
 }
