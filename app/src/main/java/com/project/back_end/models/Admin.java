@@ -1,40 +1,43 @@
 package com.project.back_end.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class Admin {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long admin_id;
+    // 1. Primary key field
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    // 2. Username field
+    @NotNull(message = "username cannot be null")
+    @Column(nullable = false, unique = true)
+    private String username;
 
-  @NotNull(message = " Username cannot be null.")
-  private String username;
+    // 3. Password field (write-only in JSON)
+    @NotNull(message = "username cannot be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
 
+    // Default constructor (required by JPA)
+    public Admin() {}
 
-  @NotNull(message = "Password cannot be null." )
-  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  private String password;
-
-
-  public Admin(){}
-
-  public Admin(Long id, String username, String password){
-    admin_id = id;
-    this.username = username;
-    this.password = password;
-  }
-
-  public Long getAdmin_id() {
-        return admin_id;
+    // Parameterized constructor
+    public Admin(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public void setAdmin_id(Long admin_id) {
-        this.admin_id = admin_id;
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -45,11 +48,11 @@ public class Admin {
         this.username = username;
     }
 
-    // --- Setter only for password (no getter for security) ---
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
-
-  
-
 }
