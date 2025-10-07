@@ -1,54 +1,52 @@
 package com.project.back_end.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class Patient {
 
+    // 1. Primary key
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long patient_id;
+    // 2. Full name
+    @NotNull(message = "Name can not be null.")
+    @Size(min = 3, max = 100)
+    @Column(nullable = false)
+    private String name;
 
-  @NotNull(message = "Name cannot be null.")
-  @Size(min = 3, max = 100)
-  private String name;
+    // 3. Email (must be unique and valid)
+    @NotNull(message = "Email can not be null.")
+    @Email
+    @Column(nullable = false, unique = true)
+    private String email;
 
+    // 4. Password (write-only)
+    @NotNull(message = "Password can not be null.")
+    @Size(min = 6)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(nullable = false)
+    private String password;
 
-  @NotNull(message = "Email cannot be null.")
-  @Email(message = "Invalid email format")
-  private String email;
+    // 5. Phone number (exactly 10 digits)
+    @NotNull(message = "Phone can not be null.")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
+    @Column(nullable = false, unique = true)
+    private String phone;
 
+    // 6. Address (required, max 255 chars)
+    @NotNull(message = "Address can not be null.")
+    @Size(max = 255)
+    @Column(nullable = false, length = 255)
+    private String address;
 
-  @NotNull(message = "Password cannot be null.")
-  @Size(min = 6)
-  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  private String password;
+    // Default constructor (required by JPA)
+    public Patient() {}
 
-
-  @NotNull(message = "Phone cannot be null.")
-  @Pattern(regexp = "^[0-9]{10}$")
-  private String phone;
-
-  @NotNull(message = "Address cannot be null")
-  @Size(max = 255)
-  private String address;
-
- 
-    public Patient() {
-    }
-
-  
-    public Patient(String name, String email, String phone, String address) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.address = address;
-    }
-
-    
+    // Parameterized constructor
     public Patient(String name, String email, String password, String phone, String address) {
         this.name = name;
         this.email = email;
@@ -57,14 +55,13 @@ public class Patient {
         this.address = address;
     }
 
-    // --- Getters and Setters ---
-
-    public Long getPatient_id() {
-        return patient_id;
+    // Getters and setters
+    public Long getId() {
+        return id;
     }
 
-    public void setPatient_id(Long patient_id) {
-        this.patient_id = patient_id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -83,7 +80,10 @@ public class Patient {
         this.email = email;
     }
 
-    // Password setter only (write-only)
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -103,5 +103,4 @@ public class Patient {
     public void setAddress(String address) {
         this.address = address;
     }
-
 }
