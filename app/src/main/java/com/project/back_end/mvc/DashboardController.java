@@ -4,47 +4,42 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.project.back_end.services.CentralService;
+
+import java.util.Map;
 
 @Controller
 public class DashboardController {
 
+    // 1. Autowired service for token validation
+    @Autowired
+    private CentralService centralService; // Assume this service exists later
 
-  @Autowire
-  private Service service;
+    // 2. Admin Dashboard
+    @GetMapping("/adminDashboard/{token}")
+    public String adminDashboard(@PathVariable("token") String token) {
+        Map<String, Object> validationResult = centralService.validateToken(token, "admin");
 
-  @GetMapping("/adminDashboard/{token}")
-  public String adminDashboard(@PathVariable("token") String token) {
+        // If validation result is empty → token is valid
+        if (validationResult.isEmpty()) {
+            return "admin/adminDashboard"; // Thymeleaf template for admin dashboard
+        } else {
+            // Invalid token → redirect to login page
+            return "redirect:http://localhost:8080";
+        }
+    }
 
-    //Validate the token for the 'admin' role
-    boolean isValid = service.validateToken(token, "admin")
+    // 3. Doctor Dashboard
+    @GetMapping("/doctorDashboard/{token}")
+    public String doctorDashboard(@PathVariable("token") String token) {
+        Map<String, Object> validationResult = centralService.validateToken(token, "doctor");
 
-      if (isValid) {
-        // Forward to admin dashboard
-        return "admin/adminDashboard";
-      } else {
-        //Redirect to root (login/home page)
-        return "redirect:http://localhost:8080";
-      }
-      
-  }
-
-  @GetMapping("/doctorDashboard/{token}")
-  public String doctorDashboard(@PathVariable("token") String token) {
-
-    //Validate the token for the 'admin' role
-    boolean isValid = service.validateToken(token, "doctor")
-
-      if (isValid) {
-        // Forward to doctor dashboard
-        return "doctor/doctorDashboard";
-      } else {
-        //Redirect to root (login/home page)
-        return "redirect:http://localhost:8080";
-      }
-      
-  }
-
-
-
-
+        // If validation result is empty → token is valid
+        if (validationResult.isEmpty()) {
+            return "doctor/doctorDashboard"; // Thymeleaf template for doctor dashboard
+        } else {
+            // Invalid token → redirect to login page
+            return "redirect:http://localhost:8080";
+        }
+    }
 }
