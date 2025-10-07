@@ -65,7 +65,7 @@ public ResponseEntity<Map<String, Object>> getPatientAppointment(Long id, String
     Map<String, Object> response = new HashMap<>();
     try {
         // 1. Extract email from token
-        String email = tokenService.extractEmail(token);
+        String email = tokenService.extractIdentifier(token);
         System.out.println("Decoded email from token: " + email);
 
         // 2. Find patient by email
@@ -255,7 +255,7 @@ public ResponseEntity<Map<String, Object>> getPatientDetails(String token) {
         System.out.println("Extracting patient email from token...");
 
         // Extract email from token
-        String email = tokenService.extractEmail(token);
+        String email = tokenService.extractIdentifier(token);
         if (email == null || email.isEmpty()) {
             response.put("error", "Invalid token or email not found");
             return ResponseEntity.status(401).body(response);
