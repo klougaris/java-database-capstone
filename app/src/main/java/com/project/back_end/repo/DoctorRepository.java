@@ -1,28 +1,27 @@
 package com.project.back_end.repo;
 
-
-import com.project.back_end.models.Doctor; 
+import com.project.back_end.models.Doctor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
-   public Doctor findByEmail(String email);
+    // 1. Find a doctor by email
+    Doctor findByEmail(String email);
 
-   @Query("SELECT d FROM Doctor d WHERE d.name LIKE CONCAT('%', :name, '%')")
-   public List<Doctor> findByNameLike(String name);
+    // 2. Find doctors by partial name match (case-sensitive)
+    @Query("SELECT d FROM Doctor d WHERE d.name LIKE CONCAT('%', :name, '%')")
+    List<Doctor> findByNameLike(String name);
 
-   @Query("SELECT d FROM Doctor d " +
-           "WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
+    // 3. Filter doctors by partial name and exact specialty (case-insensitive)
+    @Query("SELECT d FROM Doctor d WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
            "AND LOWER(d.specialty) = LOWER(:specialty)")
-   public List<Doctor> findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(String name, String specialty);
+    List<Doctor> findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(String name, String specialty);
 
-   @Query("SELECT d FROM Doctor d WHERE LOWER(d.specialty) = LOWER(:specialty)")
-   public List<Doctor> findBySpecialtyIgnoreCase(String specialty);
-
+    // 4. Find doctors by specialty (case-insensitive)
+    List<Doctor> findBySpecialtyIgnoreCase(String specialty);
 }
