@@ -160,13 +160,13 @@ public class CentralService {
         try {
             Map<String, Object> response = new HashMap<>();
             if (condition != null && !condition.isEmpty() && name != null && !name.isEmpty()) {
-                return patientService.filterByDoctorAndCondition(condition, name, tokenService.getIdFromToken(token));
+                return patientService.filterByDoctorAndCondition(condition, name, tokenService.getPatientIdFromToken(token));
             } else if (condition != null && !condition.isEmpty()) {
-                return patientService.filterByCondition(condition, tokenService.getIdFromToken(token));
+                return patientService.filterByCondition(condition, tokenService.getPatientIdFromToken(token));
             } else if (name != null && !name.isEmpty()) {
-                return patientService.filterByDoctor(name, tokenService.getIdFromToken(token));
+                return patientService.filterByDoctor(name, tokenService.getPatientIdFromToken(token));
             } else {
-                return patientService.getPatientAppointment(tokenService.getIdFromToken(token), token);
+                return patientService.getPatientAppointment(tokenService.getPatientIdFromToken(token), token);
             }
         } catch (Exception e) {
             e.printStackTrace();
