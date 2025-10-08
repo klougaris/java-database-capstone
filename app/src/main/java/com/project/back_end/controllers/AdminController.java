@@ -1,36 +1,29 @@
 package com.project.back_end.controllers;
 
 import com.project.back_end.models.Admin;
-import com.project.back_end.services.Service;
-
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import com.project.back_end.services.CentralService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 
 @RestController
 @RequestMapping("${api.path}admin")
 public class AdminController {
 
+    private final CentralService centralService;
 
-    private final Service service;
-
-    // Constructor injection
-    public AdminController(Service service) {
-        this.service = service;
+    // Constructor injection for the service
+    @Autowired
+    public AdminController(CentralService centralService) {
+        this.centralService = service;
     }
 
-    @PostMapping("/login")
+    // Endpoint for admin login
+    @PostMapping
     public ResponseEntity<Map<String, String>> adminLogin(@RequestBody Admin admin) {
-        // Delegate login validation to the service
+        // Delegate authentication to the Service layer
         return service.validateAdmin(admin);
     }
-
-
 }
-
