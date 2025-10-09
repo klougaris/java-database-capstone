@@ -1,118 +1,145 @@
-// Import necessary functions
-import { showBookingOverlay } from './loggedPatient.js';
-import { deleteDoctor } from './doctorServices.js';
-import { fetchPatientDetails } from './patientServices.js';
+// ==========================================================
+// File: doctorCard.js
+// Description:
+//   Creates reusable doctor card components for Admin and Patient dashboards.
+//   Each card displays doctor information (name, specialty, email, availability)
+//   and provides role-specific actions like "Delete" (Admin) or "Book Now" (Patient).
+//
+// NOTE:
+//   This component uses helper functions imported from service files that will
+//   be implemented in the next lab:
+//
+//   - deleteDoctor() from: /js/services/doctorServices.js
+//   - getPatientData() from: /js/services/patientServices.js
+//
+//   These service modules will handle API interactions and are part of the
+//   modular architecture designed for better maintainability and code reuse.
+// ==========================================================
 
-/**
- * Creates a DOM element representing a single doctor card
- * @param {Object} doctor - Doctor data (name, specialization, email, availableSlots)
- * @returns {HTMLElement} - Doctor card element
- */
+// ===== Imports =====
+import { deleteDoctor } from "../services/doctorServices.js";
+import { getPatientData } from "../services/patientServices.js";
+import { showBookingOverlay } from "../loggedPatient.js";
+
+// ===== Main Function =====
 export function createDoctorCard(doctor) {
-  const userRole = localStorage.getItem('userRole');
-  const token = localStorage.getItem('token');
+  // Create main card container
+  const card = document.createElement("div");
+  card.classList.add("doctor-card");
 
-  // Main doctor card container
-  const card = document.createElement('div');
-  card.classList.add('doctor-card');
+  // Fetch user role from localStorage
+  const role = localStorage.getItem("userRole");
 
-  // Doctor info container
-  const infoContainer = document.createElement('div');
-  infoContainer.classList.add('doctor-info');
+  // ===== Doctor Info Section =====
+  const infoDiv = document.createElement("div");
+  infoDiv.classList.add("doctor-info");
 
-  // Doctor name
-  const nameEl = document.createElement('h3');
-  nameEl.textContent = doctor.name;
-  infoContainer.appendChild(nameEl);
+  const name = document.createElement("h3");
+  name.textContent = doctor.name || "Unknown Doctor";
 
-  // Doctor specialization
-  const specializationEl = document.createElement('p');
-  specializationEl.textContent = `Specialization: ${doctor.specialization}`;
-  infoContainer.appendChild(specializationEl);
+  const specialization = document.createElement("p");
+  specialization.textContent = `Specialization: ${doctor.specialization || "N/A"}`;
 
-  // Doctor email
-  const emailEl = document.createElement('p');
-  emailEl.textContent = `Email: ${doctor.email}`;
-  infoContainer.appendChild(emailEl);
+  const email = document.createElement("p");
+  email.textContent = `Email: ${doctor.email || "N/A"}`;
 
-  // Available appointment times
-  const slotsEl = document.createElement('p');
-  slotsEl.textContent = `Available Slots: ${doctor.availableSlots.join(', ')}`;
-  infoContainer.appendChild(slotsEl);
+  const availability = document.createElement("p");
+  const availableTimes = Array.isArray(doctor.availability)
+    ? doctor.availability.join(", ")
+    : doctor.availability || "Not specified";
+  availability.textContent = `Availability: ${availableTimes}`;
 
-  // Actions container
-  const actionsContainer = document.createElement('div');
-  actionsContainer.classList.add('doctor-actions');
+  // Append info to info container
+  infoDiv.appendChild(name);
+  infoDiv.appendChild(specialization);
+  infoDiv.appendChild(email);
+  infoDiv.appendChild(availability);
 
-  // === ADMIN ROLE ACTIONS ===
-  if (userRole === 'admin') {
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Delete';
-    deleteBtn.classList.add('adminBtn');
+  // ===== Actions Section =====
+  const actionsDiv = document.createElement("div");
+  actionsDiv.classList.add("card-actions");
 
-    deleteBtn.addEventListener('click', async () => {
-      const adminToken = localStorage.getItem('token');
-      if (!adminToken) {
-        alert('Admin not authenticated');
-        return;
-      }
+  // ===== ADMIN ROLE =====
+  if (role === "admin") {
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Delete";
+    removeBtn.classList.add("delete-btn");
+
+    removeBtn.addEventListener("click", async () => {
+      const confirmDelete = confirm(`Are you sure you want to delete Dr. ${doctor.name}?`);
+      if (!confirmDelete) return;
+
       try {
-        const result = await deleteDoctor(doctor.id, adminToken);
-        if (result.success) {
-          alert('Doctor deleted successfully');
-          card.remove();
+        const token = localStorage.getItem("token");
+        if (!token) {
+          alert("Unauthorized. Please log in again.");
+          return;
+        }
+
+        const success = await deleteDoctor(doctor.id, token);
+        if (success) {
+          alert(`Doctor ${doctor.name} removed successfully.`);
+          card.remove(); // Remove from DOM
         } else {
-          alert('Failed to delete doctor');
+          alert("Failed to remove doctor. Please try again.");
         }
       } catch (err) {
-        console.error(err);
-        alert('Error deleting doctor');
+        console.error("Error deleting doctor:", err);
+        alert("An error occurred while deleting the doctor.");
       }
     });
 
-    actionsContainer.appendChild(deleteBtn);
+    actionsDiv.appendChild(removeBtn);
   }
 
-  // === PATIENT (NOT LOGGED-IN) ROLE ACTIONS ===
-  if (!userRole || userRole === 'patient') {
-    const bookBtn = document.createElement('button');
-    bookBtn.textContent = 'Book Now';
-    bookBtn.classList.add('book-btn');
+  // ===== PATIENT (NOT LOGGED-IN) ROLE =====
+  else if (role === "patient") {
+    const bookNow = document.createElement("button");
+    bookNow.textContent = "Book Now";
+    bookNow.classList.add("book-btn");
 
-    bookBtn.addEventListener('click', () => {
-      alert('Please log in to book an appointment');
+    bookNow.addEventListener("click", () => {
+      alert("Please log in to book an appointment.");
     });
 
-    actionsContainer.appendChild(bookBtn);
+    actionsDiv.appendChild(bookNow);
   }
 
-  // === LOGGED-IN PATIENT ROLE ACTIONS ===
-  if (userRole === 'loggedPatient') {
-    const bookBtn = document.createElement('button');
-    bookBtn.textContent = 'Book Now';
-    bookBtn.classList.add('book-btn');
+  // ===== LOGGED-IN PATIENT ROLE =====
+  else if (role === "loggedPatient") {
+    const bookNow = document.createElement("button");
+    bookNow.textContent = "Book Now";
+    bookNow.classList.add("book-btn");
 
-    bookBtn.addEventListener('click', async () => {
+    bookNow.addEventListener("click", async (e) => {
+      const token = localStorage.getItem("token");
       if (!token) {
-        alert('Session expired. Please log in again.');
-        window.location.href = '/';
+        alert("Session expired. Please log in again.");
+        window.location.href = "/";
         return;
       }
+
       try {
-        const patientData = await fetchPatientDetails(token);
-        showBookingOverlay(doctor, patientData);
-      } catch (err) {
-        console.error(err);
-        alert('Failed to fetch patient data');
+        const patientData = await getPatientData(token);
+        if (!patientData) {
+          alert("Unable to retrieve your account details. Please log in again.");
+          return;
+        }
+
+        // Show booking overlay
+        showBookingOverlay(e, doctor, patientData);
+      } catch (error) {
+        console.error("Error fetching patient data:", error);
+        alert("Unable to load booking form. Try again later.");
       }
     });
 
-    actionsContainer.appendChild(bookBtn);
+    actionsDiv.appendChild(bookNow);
   }
 
-  // Append info and actions to card
-  card.appendChild(infoContainer);
-  card.appendChild(actionsContainer);
+  // ===== Final Assembly =====
+  card.appendChild(infoDiv);
+  card.appendChild(actionsDiv);
 
   return card;
 }
