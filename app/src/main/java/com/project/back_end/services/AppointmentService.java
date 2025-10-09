@@ -114,9 +114,6 @@ public class AppointmentService {
             return result;
         }
 
-
-        Long doctorId = (Long) doctorMap.get("id");
-
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.atTime(LocalTime.MAX);
 
