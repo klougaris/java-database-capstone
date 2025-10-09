@@ -1,7 +1,7 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.entities.Login;
-import com.project.back_end.entities.Patient;
+import com.project.back_end.DTO.Login;
+import com.project.back_end.models.Patient;
 import com.project.back_end.services.PatientService;
 import com.project.back_end.services.CentralService;
 import com.project.back_end.services.TokenService;
@@ -23,19 +23,19 @@ public class PatientController {
     public PatientController(PatientService patientService, CentralService centralService, TokenService tokenService) {
         this.patientService = patientService;
         this.centralService = centralService;
-	this.tokenService = tokenService;
+        this.tokenService = tokenService;
     }
 
     // 1. Get Patient Details
     @GetMapping("/{token}")
-    public ResponseEntity<?> getPatient(@PathVariable String token) {
+    public ResponseEntity<Map<String, Object>> getPatient(@PathVariable String token) {
         boolean validToken = tokenService.validateToken(token, "patient");
         if (!validToken) {
             return ResponseEntity.status(401).body(Map.of("message", "Invalid or expired token"));
         }
 
-        Map<String, Object> patientDetails = patientService.getPatientDetails(token);
-        return ResponseEntity.ok(patientDetails);
+        // Directly return the ResponseEntity from service
+        return patientService.getPatientDetails(token);
     }
 
     // 2. Create a New Patient
@@ -61,7 +61,7 @@ public class PatientController {
 
     // 4. Get Patient Appointments
     @GetMapping("/{id}/{token}")
-    public ResponseEntity<?> getPatientAppointments(
+    public ResponseEntity<Map<String, Object>> getPatientAppointments(
             @PathVariable Long id,
             @PathVariable String token
     ) {
@@ -70,13 +70,13 @@ public class PatientController {
             return ResponseEntity.status(401).body(Map.of("message", "Invalid or expired token"));
         }
 
-        Map<String, Object> appointments = patientService.getPatientAppointment(id);
-        return ResponseEntity.ok(appointments);
+        // Directly return ResponseEntity from service
+        return patientService.getPatientAppointment(id, token);
     }
 
     // 5. Filter Patient Appointments
     @GetMapping("/filter/{condition}/{name}/{token}")
-    public ResponseEntity<?> filterPatientAppointments(
+    public ResponseEntity<Map<String, Object>> filterPatientAppointments(
             @PathVariable String condition,
             @PathVariable String name,
             @PathVariable String token
@@ -86,7 +86,14 @@ public class PatientController {
             return ResponseEntity.status(401).body(Map.of("message", "Invalid or expired token"));
         }
 
-        Map<String, Object> filteredAppointments = centralService.filterPatient(condition, name, token);
-        return ResponseEntity.ok(filteredAppointments);
+        // Logic: depending on parameters, call the right filter from PatientService
+        String conditionLower = condition.toLowerCase();
+        if (name.equalsIgnoreCase("none")) {
+            return patientService.filterByCondition(conditionLower, tokenService.getPatientIdFromToken(token));
+        } else if (condition.equalsIgnoreCase("none")) {
+            return patientService.filterByDoctor(name, tokenService.getPatientIdFromToken(token));
+        } else {
+            return patientService.filterByDoctorAndCondition(conditionLower, name, tokenService.getPatientIdFromToken(token));
+        }
     }
 }
