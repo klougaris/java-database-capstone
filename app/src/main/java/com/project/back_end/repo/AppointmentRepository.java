@@ -43,6 +43,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            "AND a.patient.id = :patientId AND a.status = :status")
     List<Appointment> filterByDoctorNameAndPatientIdAndStatus(String doctorName, Long patientId, int status);
 
+    List<Appointment> findByPatientIdAndStatus(Long patientId, int status);
     // 8. Update appointment status by appointment ID
     @Modifying
     @Transactional
