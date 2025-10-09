@@ -3,55 +3,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Metadata and Resources -->
   <meta charset="UTF-8">
-  <title>Select Role</title>
+  <title>Select Your Role</title>
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="../assets/images/logo/Logo.png">
+  <link rel="icon" type="image/png" href="./assets/images/logo/logo.png">
 
-  <!-- Stylesheets -->
+  <!-- CSS Styles -->
   <link rel="stylesheet" href="./assets/css/index.css">
   <link rel="stylesheet" href="./assets/css/style.css">
 
-  <!-- JavaScript Utilities & Components (Deferred) -->
+  <!-- Utility JS (non-blocking) -->
   <script src="./js/util.js" defer></script>
   <script src="./js/render.js" defer></script>
+
+  <!-- Component JS (non-blocking) -->
   <script src="./js/components/header.js" defer></script>
   <script src="./js/components/footer.js" defer></script>
 </head>
 <body>
-  <!-- Main Container -->
   <div class="container">
     <div class="wrapper">
-      
-      <!-- Header Placeholder (Filled by JS) -->
+      <!-- Header Placeholder -->
       <div id="header"></div>
 
       <!-- Main Content -->
-      <main>
-        <h1>Select Your Role</h1>
+      <main class="main-content">
+        <h2>Select Your Role</h2>
         <div class="role-buttons">
-          <button id="adminBtn">Admin</button>
-          <button id="patientBtn">Patient</button>
-          <button id="doctorBtn">Doctor</button>
+          <button id="adminBtn" onclick="selectRole('Admin')">Admin</button>
+          <button id="doctorBtn" onclick="selectRole('Doctor')">Doctor</button>
+          <button id="patientBtn" onclick="selectRole('Patient')">Patient</button>
         </div>
       </main>
 
-      <!-- Footer Placeholder (Filled by JS) -->
+      <!-- Modal (Hidden by Default) -->
+      <div id="modal" class="modal" style="display: none;">
+        <button id="closeModal" class="close-modal">&times;</button>
+        <div id="modal-body" class="modal-body"></div>
+      </div>
+
+      <!-- Footer Placeholder -->
       <div id="footer"></div>
     </div>
   </div>
 
-  <!-- Modal Structure -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-content">
-      <span id="closeModal" class="close-button">&times;</span>
-      <div id="modalInner"><!-- Dynamic content goes here --></div>
-    </div>
-  </div>
-
-  <!-- Page-Specific Logic -->
+  <!-- Service Script for Role Selection & Modal -->
   <script type="module" src="../js/services/index.js" defer></script>
 </body>
 </html>
