@@ -17,13 +17,13 @@ public class AdminController {
     // Constructor injection for the service
     @Autowired
     public AdminController(CentralService centralService) {
-        this.centralService = service;
+        this.centralService = centralService;
     }
 
     // Endpoint for admin login
     @PostMapping
     public ResponseEntity<Map<String, String>> adminLogin(@RequestBody Admin admin) {
         // Delegate authentication to the Service layer
-        return service.validateAdmin(admin);
+        return centralService.validateAdmin(admin);
     }
 }
