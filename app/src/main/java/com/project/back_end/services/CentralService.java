@@ -101,11 +101,11 @@ public class CentralService {
     // 4. Validate appointment availability
     public int validateAppointment(Appointment appointment) {
         try {
-            Optional<Doctor> doctorOpt = doctorRepository.findById(appointment.getDoctorId());
+            Optional<Doctor> doctorOpt = doctorRepository.findById(appointment.getDoctor().getId());
             if (!doctorOpt.isPresent()) return -1;
 
             List<String> availableSlots = doctorService.getDoctorAvailability(
-                    appointment.getDoctorId(), appointment.getAppointmentTime().toLocalDate()
+                    appointment.getDoctor().getId(), appointment.getAppointmentTime().toLocalDate()
             );
 
             String requestedTime = appointment.getAppointmentTime().toLocalTime().toString();
