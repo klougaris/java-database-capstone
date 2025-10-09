@@ -25,7 +25,7 @@ public class DoctorController {
     public DoctorController(DoctorService doctorService, CentralService centralService, TokenService tokenService) {
         this.doctorService = doctorService;
         this.centralService = centralService;
-	this.tokenService = tokenService
+	    this.tokenService = tokenService;
     }
 
     // 1. Get doctor availability
